@@ -5,6 +5,7 @@ from PySide import QtCore, QtGui
 import sys
 import gnupg
 import datetime
+from color import WeekCalendar
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -24,7 +25,7 @@ except AttributeError:
 
 class Ui_MainWindow(object):
 
-    def initialize(self, passphrase):
+    def initialize(self):
         self.password, ok = QtGui.QInputDialog.getText(self.btnExit, 'Daily Journal Initialize',
                                                        'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
         if ok is False:
@@ -41,8 +42,7 @@ class Ui_MainWindow(object):
             filecontent = self.decrypt(filecontent, self.password)
             filecontent = filecontent.decode('utf-8')
             datefile.close()
-        except Exception, e:
-            print e
+        except:
             filecontent = u""
         self.textEdit.setText(filecontent)
 
@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
         return ret
 
     def quit(self):
-        content = self.textEdit.toPlainText().encode('utf-8')
+        content = self.textEdit.toPlainText()
         date = self.calendar1.selectedDate()
         day = date.day()
         month = date.month()
@@ -64,7 +64,7 @@ class Ui_MainWindow(object):
         try:
             filename = "journal_%s_%s_%s" % (day, month, year)
             datefile = open(filename, 'r')
-            filecontent = self.decrypt(datefile.read(), self.password).encode('utf-8')
+            filecontent = self.decrypt(datefile.read(), self.password).decode('utf-8')
             datefile.close()
         except:
             filecontent = ''
@@ -180,15 +180,12 @@ class Ui_MainWindow(object):
             self.textEdit.setText(filecontent)
             self.currentDate = date
 
-    def textclicked(self):
-        print "Clicked"
-
-    def setupUi(self, MainWindow, passphrase):
+    def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(800, 600)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.calendar1 = QtGui.QCalendarWidget(self.centralwidget)
+        self.calendar1 = WeekCalendar(self.centralwidget)
         self.calendar1.setGeometry(QtCore.QRect(20, 20, 336, 148))
         self.calendar1.setObjectName(_fromUtf8("calendar1"))
         self.calendar1.clicked.connect(self.calendarclicked)
@@ -229,7 +226,7 @@ class Ui_MainWindow(object):
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.menuHelp.addAction(self.actionAbout)
         self.menubar.addAction(self.menuHelp.menuAction())
-        self.initialize(passphrase)
+        self.initialize()
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
