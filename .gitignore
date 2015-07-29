@@ -1,0 +1,5 @@
+journal_*
+!journal_ui.py
+*.swp
+*.swo
+*.pyc
