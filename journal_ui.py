@@ -25,7 +25,10 @@ except AttributeError:
 class Ui_MainWindow(object):
 
     def initialize(self, passphrase):
-        self.password = passphrase
+        self.password, ok = QtGui.QInputDialog.getText(self.btnExit, 'Daily Journal Initialize',
+                                                       'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
+        if ok is False:
+            sys.exit(0)
         self.currentDate = QtCore.QDate(datetime.date.today().year,
                                         datetime.date.today().month, datetime.date.today().day)
         day = self.currentDate.day()
@@ -34,10 +37,13 @@ class Ui_MainWindow(object):
         try:
             filename = "journal_%s_%s_%s" % (day, month, year)
             datefile = open(filename, 'r')
-            filecontent = self.decrypt(datefile.read(), self.password)
+            filecontent = datefile.read()
+            filecontent = self.decrypt(filecontent, self.password)
+            filecontent = filecontent.decode('utf-8')
             datefile.close()
-        except:
-            filecontent = ""
+        except Exception, e:
+            print e
+            filecontent = u""
         self.textEdit.setText(filecontent)
 
     def confirm(self):
@@ -50,7 +56,7 @@ class Ui_MainWindow(object):
         return ret
 
     def quit(self):
-        content = self.textEdit.toPlainText()
+        content = self.textEdit.toPlainText().encode('utf-8')
         date = self.calendar1.selectedDate()
         day = date.day()
         month = date.month()
@@ -58,7 +64,7 @@ class Ui_MainWindow(object):
         try:
             filename = "journal_%s_%s_%s" % (day, month, year)
             datefile = open(filename, 'r')
-            filecontent = self.decrypt(datefile.read(), self.password)
+            filecontent = self.decrypt(datefile.read(), self.password).encode('utf-8')
             datefile.close()
         except:
             filecontent = ''
@@ -93,7 +99,7 @@ class Ui_MainWindow(object):
         day = date.day()
         month = date.month()
         year = date.year()
-        content = self.textEdit.toPlainText()
+        content = self.textEdit.toPlainText().encode('utf-8')
         encryptedcontent = self.encrypt(content, 'balasankarc@autistici.org')
         filename = "journal_%s_%s_%s" % (day, month, year)
         datefile = open(filename, 'w')
@@ -106,7 +112,7 @@ class Ui_MainWindow(object):
         currentyear = self.currentDate.year()
         try:
             currentfile = open("journal_%s_%s_%s" % (currentday, currentmonth, currentyear))
-            currentcontent = self.decrypt(currentfile.read(), self.password)
+            currentcontent = self.decrypt(currentfile.read(), self.password).decode('utf-8')
         except:
             currentcontent = ""
         content = self.textEdit.toPlainText()
@@ -120,7 +126,9 @@ class Ui_MainWindow(object):
                 try:
                     filename = "journal_%s_%s_%s" % (day, month, year)
                     datefile = open(filename, 'r')
-                    filecontent = self.decrypt(datefile.read(), self.password)
+                    filecontent = datefile.read()
+                    filecontent = self.decrypt(filecontent, self.password)
+                    filecontent = filecontent.decode('utf-8')
                     datefile.close()
                     self.textEdit.setReadOnly(True)
                     self.btnCreate.setEnabled(False)
@@ -140,7 +148,7 @@ class Ui_MainWindow(object):
                 try:
                     filename = "journal_%s_%s_%s" % (day, month, year)
                     datefile = open(filename, 'r')
-                    filecontent = self.decrypt(datefile.read(), self.password)
+                    filecontent = self.decrypt(datefile.read(), self.password).decode('utf-8')
                     datefile.close()
                     self.textEdit.setReadOnly(True)
                     self.btnCreate.setEnabled(False)
@@ -159,7 +167,7 @@ class Ui_MainWindow(object):
             try:
                 filename = "journal_%s_%s_%s" % (day, month, year)
                 datefile = open(filename, 'r')
-                filecontent = self.decrypt(datefile.read(), self.password)
+                filecontent = self.decrypt(datefile.read(), self.password).decode('utf-8')
                 datefile.close()
                 self.textEdit.setReadOnly(True)
                 self.btnCreate.setEnabled(False)
@@ -233,6 +241,5 @@ class Ui_MainWindow(object):
         self.btnExit.setText(_translate("MainWindow", "E&xit", None))
         self.textEdit.setToolTip(
             _translate("MainWindow", "Your Content goes here", None))
-        self.calendarclicked(self.calendar1.selectedDate())
         self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
         self.actionAbout.setText(_translate("MainWindow", "About", None))
