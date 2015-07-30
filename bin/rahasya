@@ -2,8 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from PySide import QtGui
+import os
 import sys
+
+if os.path.isfile(os.path.join(os.path.abspath(os.path.join(__file__, "../../")), "rahasya", "journal.py")):
+    sys.path.insert(0, os.path.join("."))
 from rahasya.journal import Ui_MainWindow
+
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
