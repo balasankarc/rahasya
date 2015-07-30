@@ -35,10 +35,12 @@ class Ui_MainWindow(object):
             self.recipients = [x.strip() for x in self.recipient.split(',')]
         except IOError:
             pass
-        self.password, ok = QtGui.QInputDialog.getText(
+        self.password, status = QtGui.QInputDialog.getText(
             self.btnExit, 'Daily Journal Initialize', 'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
-        if ok is False:
+        if status is False:
             sys.exit(0)
+        if not os.path.isdir(os.path.join(os.environ['HOME'], ".rahasya")):
+            os.mkdir(os.path.join(os.environ['HOME'], ".rahasya"))
         self.prefix = os.path.join(os.environ['HOME'], ".rahasya")
         self.currentDate = QtCore.QDate(datetime.date.today().year,
                                         datetime.date.today().month, datetime.date.today().day)
