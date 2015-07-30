@@ -6,6 +6,7 @@ import sys
 import gnupg
 import datetime
 from color import WeekCalendar
+import os
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -26,8 +27,18 @@ except AttributeError:
 class Ui_MainWindow(object):
 
     def initialize(self):
-        self.password, ok = QtGui.QInputDialog.getText(self.btnExit, 'Daily Journal Initialize',
-                                                       'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
+        if not os.path.isfile(os.path.join(os.environ['HOME'], '.config', 'rahasya', 'recipient')):
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText("No config file found at" + os.environ['HOME'] + "/.config/rahasya/recipient")
+            msgBox.setInformativeText("Please create that file containing email ids of recipients")
+            msgBox.setStandardButtons(
+                QtGui.QMessageBox.Ok)
+            msgBox.setDefaultButton(QtGui.QMessageBox.Ok)
+            msgBox.exec_()
+            sys.exit(0)
+
+        self.password, ok = QtGui.QInputDialog.getText(
+            self.btnExit, 'Daily Journal Initialize', 'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
         if ok is False:
             sys.exit(0)
         self.currentDate = QtCore.QDate(datetime.date.today().year,
@@ -55,7 +66,8 @@ class Ui_MainWindow(object):
         msgBox = QtGui.QMessageBox()
         msgBox.setText("The entry has been modified.")
         msgBox.setInformativeText("Do you want to save your changes?")
-        msgBox.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
+        msgBox.setStandardButtons(
+            QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
         msgBox.setDefaultButton(QtGui.QMessageBox.Save)
         ret = msgBox.exec_()
         return ret
@@ -74,7 +86,8 @@ class Ui_MainWindow(object):
         try:
             filename = "journal_%s_%s_%s" % (day, month, year)
             datefile = open(filename, 'r')
-            filecontent = self.decrypt(datefile.read(), self.password).decode('utf-8')
+            filecontent = self.decrypt(
+                datefile.read(), self.password).decode('utf-8')
             datefile.close()
         except:
             filecontent = ''
@@ -88,9 +101,13 @@ class Ui_MainWindow(object):
         else:
             sys.exit(0)
 
-    def encrypt(self, text, recipient):
+    def encrypt(self, text):
+        recipientfile = open(
+            os.path.join(os.environ['HOME'], '.config', 'rahasya', 'recipient'))
+        recipientlist = recipientfile.readlines()
+        recipients = [x.strip() for x in recipientlist]
         gpg = gnupg.GPG()
-        enc = gpg.encrypt(text, recipient)
+        enc = gpg.encrypt(text, recipients)
         return str(enc)
 
     def decrypt(self, content, password):
@@ -110,7 +127,7 @@ class Ui_MainWindow(object):
         month = date.month()
         year = date.year()
         content = self.textEdit.toPlainText().encode('utf-8')
-        encryptedcontent = self.encrypt(content, 'balasankarc@autistici.org')
+        encryptedcontent = self.encrypt(content)
         filename = "journal_%s_%s_%s" % (day, month, year)
         datefile = open(filename, 'w')
         datefile.write(encryptedcontent)
@@ -121,8 +138,10 @@ class Ui_MainWindow(object):
         currentmonth = self.currentDate.month()
         currentyear = self.currentDate.year()
         try:
-            currentfile = open("journal_%s_%s_%s" % (currentday, currentmonth, currentyear))
-            currentcontent = self.decrypt(currentfile.read(), self.password).decode('utf-8')
+            currentfile = open("journal_%s_%s_%s" %
+                               (currentday, currentmonth, currentyear))
+            currentcontent = self.decrypt(
+                currentfile.read(), self.password).decode('utf-8')
         except:
             currentcontent = ""
         content = self.textEdit.toPlainText()
@@ -158,7 +177,8 @@ class Ui_MainWindow(object):
                 try:
                     filename = "journal_%s_%s_%s" % (day, month, year)
                     datefile = open(filename, 'r')
-                    filecontent = self.decrypt(datefile.read(), self.password).decode('utf-8')
+                    filecontent = self.decrypt(
+                        datefile.read(), self.password).decode('utf-8')
                     datefile.close()
                     self.textEdit.setReadOnly(True)
                     self.btnCreate.setEnabled(False)
@@ -177,7 +197,8 @@ class Ui_MainWindow(object):
             try:
                 filename = "journal_%s_%s_%s" % (day, month, year)
                 datefile = open(filename, 'r')
-                filecontent = self.decrypt(datefile.read(), self.password).decode('utf-8')
+                filecontent = self.decrypt(
+                    datefile.read(), self.password).decode('utf-8')
                 datefile.close()
                 self.textEdit.setReadOnly(True)
                 self.btnCreate.setEnabled(False)
@@ -242,7 +263,8 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "Daily Journal", None))
+        MainWindow.setWindowTitle(
+            _translate("MainWindow", "Daily Journal", None))
         self.btnCreate.setText(_translate("MainWindow", "&Create", None))
         self.btnEdit.setText(_translate("MainWindow", "&Edit", None))
         self.btnSave.setText(_translate("MainWindow", "&Save", None))
