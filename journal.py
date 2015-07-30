@@ -7,6 +7,7 @@ import gnupg
 import datetime
 from color import WeekCalendar
 import os
+import ConfigParser
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -27,16 +28,13 @@ except AttributeError:
 class Ui_MainWindow(object):
 
     def initialize(self):
-        if not os.path.isfile(os.path.join(os.environ['HOME'], '.config', 'rahasya', 'recipient')):
-            msgBox = QtGui.QMessageBox()
-            msgBox.setText("No config file found at" + os.environ['HOME'] + "/.config/rahasya/recipient")
-            msgBox.setInformativeText("Please create that file containing email ids of recipients")
-            msgBox.setStandardButtons(
-                QtGui.QMessageBox.Ok)
-            msgBox.setDefaultButton(QtGui.QMessageBox.Ok)
-            msgBox.exec_()
-            sys.exit(0)
-
+        Config = ConfigParser.ConfigParser()
+        try:
+            Config.read(["/etc/rahasya/.rahasyarc", os.path.join(os.path.expanduser("~"), '.rahasyarc')])
+            self.recipient = Config.get('privacy', 'email')
+            self.recipients = [x.strip() for x in self.recipient.split(',')]
+        except IOError:
+            pass
         self.password, ok = QtGui.QInputDialog.getText(
             self.btnExit, 'Daily Journal Initialize', 'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
         if ok is False:
@@ -102,12 +100,8 @@ class Ui_MainWindow(object):
             sys.exit(0)
 
     def encrypt(self, text):
-        recipientfile = open(
-            os.path.join(os.environ['HOME'], '.config', 'rahasya', 'recipient'))
-        recipientlist = recipientfile.readlines()
-        recipients = [x.strip() for x in recipientlist]
         gpg = gnupg.GPG()
-        enc = gpg.encrypt(text, recipients)
+        enc = gpg.encrypt(text, self.recipients)
         return str(enc)
 
     def decrypt(self, content, password):
