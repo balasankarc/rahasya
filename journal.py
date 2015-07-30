@@ -42,8 +42,13 @@ class Ui_MainWindow(object):
             filecontent = self.decrypt(filecontent, self.password)
             filecontent = filecontent.decode('utf-8')
             datefile.close()
+            self.textEdit.setReadOnly(True)
+            self.btnCreate.setEnabled(False)
+            self.btnEdit.setEnabled(True)
         except:
             filecontent = u""
+            self.btnCreate.setEnabled(True)
+            self.btnEdit.setEnabled(False)
         self.textEdit.setText(filecontent)
 
     def confirm(self):
@@ -54,6 +59,11 @@ class Ui_MainWindow(object):
         msgBox.setDefaultButton(QtGui.QMessageBox.Save)
         ret = msgBox.exec_()
         return ret
+
+    def about(self):
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText("Rahasya Daily Journal")
+        msgBox.exec_()
 
     def quit(self):
         content = self.textEdit.toPlainText()
@@ -224,6 +234,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
+        self.actionAbout.triggered.connect(self.about)
         self.menuHelp.addAction(self.actionAbout)
         self.menubar.addAction(self.menuHelp.menuAction())
         self.initialize()
