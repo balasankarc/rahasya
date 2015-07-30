@@ -39,13 +39,14 @@ class Ui_MainWindow(object):
             self.btnExit, 'Daily Journal Initialize', 'Enter your GPG Passphrase:', QtGui.QLineEdit.Password)
         if ok is False:
             sys.exit(0)
+        self.prefix = os.path.join(os.environ['HOME'], ".rahasya")
         self.currentDate = QtCore.QDate(datetime.date.today().year,
                                         datetime.date.today().month, datetime.date.today().day)
         day = self.currentDate.day()
         month = self.currentDate.month()
         year = self.currentDate.year()
         try:
-            filename = "journal_%s_%s_%s" % (day, month, year)
+            filename = os.path.join(self.prefix, "journal_%s_%s_%s" % (day, month, year))
             datefile = open(filename, 'r')
             filecontent = datefile.read()
             filecontent = self.decrypt(filecontent, self.password)
@@ -82,7 +83,7 @@ class Ui_MainWindow(object):
         month = date.month()
         year = date.year()
         try:
-            filename = "journal_%s_%s_%s" % (day, month, year)
+            filename = os.path.join(self.prefix, "journal_%s_%s_%s" % (day, month, year))
             datefile = open(filename, 'r')
             filecontent = self.decrypt(
                 datefile.read(), self.password).decode('utf-8')
@@ -122,7 +123,7 @@ class Ui_MainWindow(object):
         year = date.year()
         content = self.textEdit.toPlainText().encode('utf-8')
         encryptedcontent = self.encrypt(content)
-        filename = "journal_%s_%s_%s" % (day, month, year)
+        filename = os.path.join(self.prefix, "journal_%s_%s_%s" % (day, month, year))
         datefile = open(filename, 'w')
         datefile.write(encryptedcontent)
         datefile.close()
@@ -132,8 +133,8 @@ class Ui_MainWindow(object):
         currentmonth = self.currentDate.month()
         currentyear = self.currentDate.year()
         try:
-            currentfile = open("journal_%s_%s_%s" %
-                               (currentday, currentmonth, currentyear))
+            currentfile = open(os.path.join(self.prefix, "journal_%s_%s_%s" %
+                               (currentday, currentmonth, currentyear)))
             currentcontent = self.decrypt(
                 currentfile.read(), self.password).decode('utf-8')
         except:
@@ -147,7 +148,7 @@ class Ui_MainWindow(object):
                 month = date.month()
                 year = date.year()
                 try:
-                    filename = "journal_%s_%s_%s" % (day, month, year)
+                    filename = os.path.join(self.prefix, "journal_%s_%s_%s" % (day, month, year))
                     datefile = open(filename, 'r')
                     filecontent = datefile.read()
                     filecontent = self.decrypt(filecontent, self.password)
@@ -169,7 +170,7 @@ class Ui_MainWindow(object):
                 month = date.month()
                 year = date.year()
                 try:
-                    filename = "journal_%s_%s_%s" % (day, month, year)
+                    filename = os.path.join(self.prefix, "journal_%s_%s_%s" % (day, month, year))
                     datefile = open(filename, 'r')
                     filecontent = self.decrypt(
                         datefile.read(), self.password).decode('utf-8')
@@ -189,7 +190,7 @@ class Ui_MainWindow(object):
             month = date.month()
             year = date.year()
             try:
-                filename = "journal_%s_%s_%s" % (day, month, year)
+                filename = os.path.join(self.prefix, "journal_%s_%s_%s" % (day, month, year))
                 datefile = open(filename, 'r')
                 filecontent = self.decrypt(
                     datefile.read(), self.password).decode('utf-8')
