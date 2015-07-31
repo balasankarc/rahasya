@@ -1,0 +1,4 @@
+Template: rahasya/email
+Type: string
+_Description: Email ID to be used for encryption : 
+ To assign individual email id per user, give blank below and copy /etc/rahasya/rahasyarc.example to \$HOME/.rahasyarc and modify accordingly.
