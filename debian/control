@@ -4,14 +4,20 @@ Section: python
 Priority: optional
 Build-Depends: debhelper (>= 9),
                dh-python,
+               po-debconf,
                python-all (>= 2.6.6-3),
                python-setuptools
 Standards-Version: 3.9.6
+Homepage: http://gitlab.com/balasankarc/rahasya
 
 Package: rahasya
 Architecture: all
-Depends: python-pyside, ${misc:Depends}, ${python:Depends}
+Depends: debconf (>= 0.2.17),
+         gnupg,
+         python-pyside,
+         ${misc:Depends},
+         ${python:Depends}
 Description: privacy aware Daily Journal
- Rahasya is a daily journal software that incorporates GPG encryption. It is 
- written in Python and uses Qt GUI framework. The files are stored as 
+ Rahasya is a daily journal software that incorporates GPG encryption. It is
+ written in Python and uses Qt GUI framework. The files are stored as
  encrypted text files so they can be accessed without the software.
