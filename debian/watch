@@ -1,0 +1,3 @@
+version=3
+opts=filenamemangle=s/.*\.tar\.gz\?ref=v?(\d\S*)/<project>-$1\.tar\.gz/g \
+ pgpsigurlmangle=s/$/.asc/ https://gitlab.com/balasankarc/rahasya/tags .*archive\.tar\.gz\?ref=v?(\d\S*)
