@@ -1,3 +1,10 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Inspired from the code snippet provided at https://goo.gl/L4J728
+# Licensed under GPL 
+# TODO: Clarify license
+
 from PySide.QtCore import QDate
 from PySide.QtGui import QCalendarWidget, QPalette, QColor
 import glob
